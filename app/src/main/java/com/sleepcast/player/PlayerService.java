@@ -52,6 +52,8 @@ public class PlayerService extends Service {
     public static final String ACTION_STOP = "com.sleepcast.player.STOP";
     public static final String ACTION_NEXT = "com.sleepcast.player.NEXT";
     public static final String ACTION_TOGGLE = "com.sleepcast.player.TOGGLE";
+    /** Sent by the Settings page so playback options apply without restarting the queue. */
+    public static final String ACTION_SETTINGS_CHANGED = "com.sleepcast.player.SETTINGS_CHANGED";
 
     private static final long MIN_FREE_BYTES = 500L * 1024 * 1024;
     private static final int NOTIF_ID = 1;
@@ -64,6 +66,41 @@ public class PlayerService extends Service {
     public static volatile String sNowPlaying = "";
     public static volatile String sQueueInfo = "";
     public static volatile String sDownloadInfo = "";
+    public static volatile int sEpisodeNumber = 0;
+    public static volatile String sEpisodeTitle = "";
+    public static volatile int sIndex = 0;
+    public static volatile int sQueueSize = 0;
+    public static volatile int sCachedCount = 0;
+    public static volatile boolean sStreaming = false;
+    public static volatile String sUpNext = "";
+    /** Wall-clock time (ms) the sleep timer stops playback, or 0 if off. */
+    public static volatile long sSleepEndsAt = 0;
+    private static PlayerService sInstance;
+
+    /** {positionMs, durationMs} of the current episode, or null. Call from the main thread. */
+    public static long[] progress() {
+        PlayerService s = sInstance;
+        if (s == null || s.player == null || !s.prepared) return null;
+        try {
+            return new long[]{s.player.getCurrentPosition(), s.player.getDuration()};
+        } catch (Exception e) {
+            return null;
+        }
+    }
+
+    private long sleepDeadline = 0; // elapsedRealtime; 0 = off
+    private final Runnable sleepCheck = new Runnable() {
+        @Override
+        public void run() {
+            if (!running || sleepDeadline == 0) return;
+            if (android.os.SystemClock.elapsedRealtime() >= sleepDeadline) {
+                stopEverything();
+                sStatus = "Sleep timer finished. Good night!";
+            } else {
+                main.postDelayed(this, 30_000);
+            }
+        }
+    };
 
     private final Handler main = new Handler(Looper.getMainLooper());
     private final CopyOnWriteArrayList<Episode> queue = new CopyOnWriteArrayList<>();
@@ -98,6 +135,7 @@ public class PlayerService extends Service {
     @Override
     public void onCreate() {
         super.onCreate();
+        sInstance = this;
         audioManager = (AudioManager) getSystemService(AUDIO_SERVICE);
         createChannel();
         session = new MediaSession(this, "SleepCast");
@@ -130,6 +168,9 @@ public class PlayerService extends Service {
                 else if (paused) resume();
                 else pause();
                 break;
+            case ACTION_SETTINGS_CHANGED:
+                if (running) applyPlaybackSettings(true); else stopEverything();
+                break;
             case ACTION_START:
             default:
                 startSession();
@@ -154,15 +195,14 @@ public class PlayerService extends Service {
         index = -1;
         setStatus("Loading episode list…");
 
-        acquireWifiLock();
-        registerNoisy();
-
         settings = Settings.load(this);
         String problem = settings.validate();
         if (problem != null) {
             failAndStop(problem);
             return;
         }
+        acquireWifiLock();
+        applyPlaybackSettings(false);
         final Settings mySettings = settings;
         final int mySession = ++sessionId;
         new Thread(() -> {
@@ -173,6 +213,7 @@ public class PlayerService extends Service {
                     if (!running || mySession != sessionId) return;
                     allEpisodes = feed.episodes;
                     showTitle = feed.title;
+                    Settings.put(PlayerService.this, Settings.K_LAST_SHOW, feed.title);
                     sShowInfo = feed.title + " · " + feed.episodes.size() + " episodes in "
                             + mySettings.rangeLabel() + " (numbered by "
                             + ("tag".equals(feed.numberingUsed) ? "the feed's episode numbers"
@@ -189,7 +230,7 @@ public class PlayerService extends Service {
                         return;
                     }
                     queue.addAll(picked);
-                    startDownloader();
+                    if (settings.downloadAhead) startDownloader();
                     requestFocus();
                     playIndex(0);
                 });
@@ -222,6 +263,11 @@ public class PlayerService extends Service {
     private void playIndex(int i) {
         if (!running) return;
         if (i >= queue.size()) {
+            if (!settings.keepGoing) {
+                stopEverything();
+                sStatus = "Finished tonight's queue. Good night!";
+                return;
+            }
             // Ran through the whole queue: keep the background noise going with a fresh batch.
             Set<Integer> recent = new HashSet<>();
             for (Episode e : queue) recent.add(e.number);
@@ -262,6 +308,9 @@ public class PlayerService extends Service {
 
         releasePlayer();
         sNowPlaying = ep.displayTitle();
+        sEpisodeNumber = ep.number;
+        sEpisodeTitle = ep.title;
+        sStreaming = !local.exists();
         updateQueueInfo();
         setStatus(local.exists() ? "Playing (downloaded)" : "Playing (streaming)");
         updateSession(ep);
@@ -277,7 +326,7 @@ public class PlayerService extends Service {
             if (player != p || !running) return;
             prepared = true;
             consecutiveErrors = 0;
-            if (!paused) p.start();
+            if (!paused) startWithSpeed(p);
             updatePlaybackState();
         });
         mp.setOnCompletionListener(p -> {
@@ -334,7 +383,7 @@ public class PlayerService extends Service {
         requestFocus();
         // If the episode is still loading, onPrepared will start it.
         if (player != null && prepared) {
-            try { player.start(); } catch (IllegalStateException ignored) { }
+            try { startWithSpeed(player); } catch (IllegalStateException ignored) { }
         }
         setStatus("Playing");
         updatePlaybackState();
@@ -343,6 +392,68 @@ public class PlayerService extends Service {
     private void failAndStop(String message) {
         stopEverything();
         sStatus = message;
+    }
+
+    /** Starts (or resumes) the player at the chosen speed. */
+    private void startWithSpeed(MediaPlayer p) {
+        float speed = settings == null ? 1f : settings.speed;
+        if (Math.abs(speed - 1f) > 0.01f) {
+            try {
+                // Setting a non-zero speed also starts playback.
+                p.setPlaybackParams(p.getPlaybackParams().setSpeed(speed));
+                return;
+            } catch (Exception ignored) {
+                // Some formats/devices can't change speed: fall back to normal.
+            }
+        }
+        p.start();
+    }
+
+    /** Re-reads the playback options (speed, timer, headphones, downloads) mid-session. */
+    private void applyPlaybackSettings(boolean midSession) {
+        Settings fresh = Settings.load(this);
+        int oldTimer = settings == null ? -1 : settings.sleepTimerMin;
+        if (settings == null) {
+            settings = fresh;
+        } else {
+            // Keep the podcast/range of the running queue; take everything else from Settings.
+            settings.queueSize = fresh.queueSize;
+            settings.keepGoing = fresh.keepGoing;
+            settings.sleepTimerMin = fresh.sleepTimerMin;
+            settings.speed = fresh.speed;
+            settings.pauseOnUnplug = fresh.pauseOnUnplug;
+            settings.downloadAhead = fresh.downloadAhead;
+            settings.allowMobile = fresh.allowMobile;
+            settings.maxCached = fresh.maxCached;
+        }
+
+        if (settings.pauseOnUnplug) registerNoisy(); else unregisterNoisy();
+
+        if (!midSession || oldTimer != settings.sleepTimerMin) {
+            main.removeCallbacks(sleepCheck);
+            if (settings.sleepTimerMin > 0) {
+                long ms = settings.sleepTimerMin * 60_000L;
+                sleepDeadline = android.os.SystemClock.elapsedRealtime() + ms;
+                sSleepEndsAt = System.currentTimeMillis() + ms;
+                main.postDelayed(sleepCheck, 30_000);
+            } else {
+                sleepDeadline = 0;
+                sSleepEndsAt = 0;
+            }
+        }
+
+        if (midSession) {
+            if (settings.downloadAhead && downloader == null && !queue.isEmpty()) startDownloader();
+            if (!settings.downloadAhead) stopDownloader();
+            if (player != null && prepared && !paused) {
+                try {
+                    player.setPlaybackParams(player.getPlaybackParams().setSpeed(settings.speed));
+                } catch (Exception ignored) {
+                }
+            }
+            if (!settings.downloadAhead) sDownloadInfo = "Downloading ahead is off";
+            goForeground(sStatus); // restore the notification text
+        }
     }
 
     private void stopEverything() {
@@ -357,6 +468,12 @@ public class PlayerService extends Service {
         unregisterNoisy();
         sNowPlaying = "";
         sQueueInfo = "";
+        sEpisodeNumber = 0;
+        sEpisodeTitle = "";
+        sUpNext = "";
+        sQueueSize = 0;
+        sSleepEndsAt = 0;
+        sleepDeadline = 0;
         sDownloadInfo = "";
         sShowInfo = "";
         sStatus = "Stopped. Good morning!";
@@ -370,6 +487,7 @@ public class PlayerService extends Service {
 
     @Override
     public void onDestroy() {
+        sInstance = null;
         if (running) stopEverything();
         if (session != null) {
             session.release();
@@ -521,9 +639,7 @@ public class PlayerService extends Service {
     }
 
     private File episodeDir() {
-        File base = getExternalFilesDir(null);
-        if (base == null) base = getFilesDir();
-        File dir = new File(new File(base, "episodes"), settings.feedKey());
+        File dir = new File(Downloads.root(this), settings.feedKey());
         if (!dir.exists()) dir.mkdirs();
         return dir;
     }
@@ -651,9 +767,20 @@ public class PlayerService extends Service {
         if (index < 0) return;
         int cached = 0;
         for (Episode e : queue) if (isCached(e)) cached++;
+        sIndex = index;
+        sQueueSize = queue.size();
+        sCachedCount = cached;
         sQueueInfo = String.format(Locale.US, "Episode %d of %d in tonight's queue · %d downloaded",
                 index + 1, queue.size(), cached);
+        StringBuilder next = new StringBuilder();
+        for (int j = index + 1; j < queue.size() && j <= index + 3; j++) {
+            Episode e = queue.get(j);
+            if (next.length() > 0) next.append('\n');
+            next.append(e.number).append('\t').append(e.title).append('\t').append(isCached(e) ? "1" : "0");
+        }
+        sUpNext = next.toString();
     }
+
 
     private void updateSession(Episode ep) {
         session.setMetadata(new MediaMetadata.Builder()

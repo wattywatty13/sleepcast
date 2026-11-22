@@ -1,248 +1,520 @@
 <?xml version="1.0" encoding="utf-8"?>
-<ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
+<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
-    android:layout_height="match_parent"
-    android:background="#0B0E14"
-    android:fillViewport="true">
+    android:layout_height="match_parent">
 
-    <LinearLayout
+    <com.sleepcast.player.StarfieldView
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:orientation="vertical"
-        android:padding="28dp">
+        android:layout_height="match_parent" />
 
-        <TextView
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_marginTop="24dp"
-            android:text="@string/app_name"
-            android:textColor="#E6E1D6"
-            android:textSize="34sp"
-            android:textStyle="bold" />
-
-        <TextView
-            android:id="@+id/subtitle"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_marginTop="4dp"
-            android:textColor="#7D8594"
-            android:textSize="14sp" />
-
-        <TextView
-            android:id="@+id/status"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_marginTop="40dp"
-            android:textColor="#C9A96E"
-            android:textSize="16sp" />
-
-        <TextView
-            android:id="@+id/now_playing"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_marginTop="12dp"
-            android:textColor="#E6E1D6"
-            android:textSize="22sp" />
-
-        <TextView
-            android:id="@+id/queue_info"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_marginTop="12dp"
-            android:textColor="#7D8594"
-            android:textSize="14sp" />
-
-        <TextView
-            android:id="@+id/show_info"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_marginTop="4dp"
-            android:textColor="#7D8594"
-            android:textSize="14sp" />
-
-        <TextView
-            android:id="@+id/download_info"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_marginTop="4dp"
-            android:textColor="#7D8594"
-            android:textSize="14sp" />
+    <ScrollView
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:fillViewport="true"
+        android:overScrollMode="never"
+        android:scrollbars="none">
 
         <LinearLayout
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_marginTop="32dp"
-            android:orientation="horizontal">
-
-            <Button
-                android:id="@+id/btn_pause"
-                android:layout_width="0dp"
-                android:layout_height="64dp"
-                android:layout_marginEnd="8dp"
-                android:layout_weight="1"
-                android:text="Pause"
-                android:textSize="16sp" />
-
-            <Button
-                android:id="@+id/btn_next"
-                android:layout_width="0dp"
-                android:layout_height="64dp"
-                android:layout_marginStart="8dp"
-                android:layout_weight="1"
-                android:text="Next episode"
-                android:textSize="16sp" />
-        </LinearLayout>
-
-        <Button
-            android:id="@+id/btn_stop"
-            android:layout_width="match_parent"
-            android:layout_height="80dp"
-            android:layout_marginTop="16dp"
-            android:backgroundTint="#8A3B2E"
-            android:text="Stop (good morning)"
-            android:textColor="#FFFFFF"
-            android:textSize="20sp" />
-
-        <Button
-            android:id="@+id/btn_start"
-            android:layout_width="match_parent"
-            android:layout_height="56dp"
-            android:layout_marginTop="16dp"
-            android:text="Start bedtime queue"
-            android:textSize="15sp" />
-
-        <CheckBox
-            android:id="@+id/allow_mobile"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_marginTop="28dp"
-            android:buttonTint="#C9A96E"
-            android:text="Allow streaming on mobile data (off = only play downloaded episodes when away from Wi-Fi)"
-            android:textColor="#7D8594"
-            android:textSize="13sp" />
-
-        <Button
-            android:id="@+id/btn_settings"
-            android:layout_width="match_parent"
-            android:layout_height="52dp"
-            android:layout_marginTop="20dp"
-            android:text="Settings: podcast feed &amp; episode range"
-            android:textSize="14sp" />
-
-        <LinearLayout
-            android:id="@+id/settings_panel"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:orientation="vertical"
-            android:visibility="gone">
+            android:paddingStart="22dp"
+            android:paddingTop="20dp"
+            android:paddingEnd="22dp"
+            android:paddingBottom="28dp">
 
-            <TextView
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:layout_marginTop="14dp"
-                android:text="Podcast RSS feed URL"
-                android:textColor="#C9A96E"
-                android:textSize="13sp" />
-
-            <EditText
-                android:id="@+id/feed_url"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:hint="https://example.com/feed.xml"
-                android:inputType="textUri"
-                android:textColor="#E6E1D6"
-                android:textColorHint="#555C69"
-                android:textSize="15sp" />
-
-            <TextView
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:layout_marginTop="14dp"
-                android:text="From episode"
-                android:textColor="#C9A96E"
-                android:textSize="13sp" />
-
-            <EditText
-                android:id="@+id/min_episode"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:hint="1"
-                android:inputType="number"
-                android:textColor="#E6E1D6"
-                android:textColorHint="#555C69"
-                android:textSize="15sp" />
-
-            <TextView
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:layout_marginTop="14dp"
-                android:text="To episode (0 = no limit)"
-                android:textColor="#C9A96E"
-                android:textSize="13sp" />
-
-            <EditText
-                android:id="@+id/max_episode"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:hint="700"
-                android:inputType="number"
-                android:textColor="#E6E1D6"
-                android:textColorHint="#555C69"
-                android:textSize="15sp" />
-
-            <TextView
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:layout_marginTop="14dp"
-                android:text="Episodes per night"
-                android:textColor="#C9A96E"
-                android:textSize="13sp" />
-
-            <EditText
-                android:id="@+id/queue_size"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:hint="20"
-                android:inputType="number"
-                android:textColor="#E6E1D6"
-                android:textColorHint="#555C69"
-                android:textSize="15sp" />
-
-            <TextView
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:layout_marginTop="14dp"
-                android:text="How to number episodes"
-                android:textColor="#C9A96E"
-                android:textSize="13sp" />
-
-            <Spinner
-                android:id="@+id/numbering"
-                android:layout_width="match_parent"
-                android:layout_height="48dp" />
-
+            <!-- ============ Header ============ -->
             <LinearLayout
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_marginTop="12dp"
+                android:gravity="center_vertical"
                 android:orientation="horizontal">
 
-                <Button
-                    android:id="@+id/btn_save"
-                    android:layout_width="0dp"
-                    android:layout_height="52dp"
-                    android:layout_marginEnd="8dp"
-                    android:layout_weight="1"
-                    android:text="Save &amp; start" />
+                <ImageButton
+                    android:id="@+id/btn_menu"
+                    android:layout_width="46dp"
+                    android:layout_height="46dp"
+                    android:background="@drawable/bg_circle"
+                    android:contentDescription="Open menu"
+                    android:padding="12dp"
+                    android:scaleType="fitCenter"
+                    android:src="@drawable/ic_menu"
+                    android:tint="#C9CFDB" />
 
-                <Button
-                    android:id="@+id/btn_reset"
+                <View
                     android:layout_width="0dp"
-                    android:layout_height="52dp"
-                    android:layout_marginStart="8dp"
-                    android:layout_weight="1"
-                    android:text="Reset defaults" />
+                    android:layout_height="1dp"
+                    android:layout_weight="1" />
+
+                <ImageView
+                    android:layout_width="32dp"
+                    android:layout_height="32dp"
+                    android:src="@drawable/ic_moon"
+                    android:tint="#E8C887" />
             </LinearLayout>
+
+            <TextView
+                android:id="@+id/greeting"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="22dp"
+                android:fontFamily="sans-serif-medium"
+                android:letterSpacing="0.22"
+                android:text="GOOD NIGHT"
+                android:textColor="#E8C887"
+                android:textSize="11sp" />
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="4dp"
+                android:fontFamily="sans-serif-light"
+                android:text="@string/app_name"
+                android:textColor="#F4EEDF"
+                android:textSize="34sp" />
+
+            <TextView
+                android:id="@+id/show_subtitle"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="2dp"
+                android:ellipsize="end"
+                android:maxLines="1"
+                android:textColor="#8A93A6"
+                android:textSize="13sp" />
+
+            <!-- ============ Idle (nothing playing) ============ -->
+            <LinearLayout
+                android:id="@+id/idle_panel"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="56dp"
+                android:gravity="center_horizontal"
+                android:orientation="vertical"
+                android:visibility="gone">
+
+                <ImageView
+                    android:layout_width="96dp"
+                    android:layout_height="96dp"
+                    android:alpha="0.9"
+                    android:src="@drawable/ic_moon"
+                    android:tint="#E8C887" />
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="24dp"
+                    android:fontFamily="sans-serif-light"
+                    android:text="Ready when you are"
+                    android:textColor="#F4EEDF"
+                    android:textSize="24sp" />
+
+                <TextView
+                    android:id="@+id/idle_status"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="8dp"
+                    android:gravity="center"
+                    android:textColor="#8A93A6"
+                    android:textSize="14sp" />
+
+                <TextView
+                    android:id="@+id/btn_start"
+                    android:layout_width="match_parent"
+                    android:layout_height="60dp"
+                    android:layout_marginTop="36dp"
+                    android:background="@drawable/bg_pill_gold"
+                    android:clickable="true"
+                    android:focusable="true"
+                    android:fontFamily="sans-serif-medium"
+                    android:gravity="center"
+                    android:text="Start tonight's queue"
+                    android:textColor="#1C1408"
+                    android:textSize="17sp" />
+            </LinearLayout>
+
+            <!-- ============ Playing ============ -->
+            <LinearLayout
+                android:id="@+id/play_panel"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="vertical">
+
+                <!-- Now playing card -->
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="28dp"
+                    android:background="@drawable/bg_card"
+                    android:orientation="vertical"
+                    android:padding="22dp">
+
+                    <LinearLayout
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:gravity="center_vertical"
+                        android:orientation="horizontal">
+
+                        <TextView
+                            android:layout_width="0dp"
+                            android:layout_height="wrap_content"
+                            android:layout_weight="1"
+                            android:fontFamily="sans-serif-medium"
+                            android:letterSpacing="0.2"
+                            android:text="NOW PLAYING"
+                            android:textColor="#8A93A6"
+                            android:textSize="11sp" />
+
+                        <TextView
+                            android:id="@+id/source_chip"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:background="@drawable/bg_chip_gold"
+                            android:fontFamily="sans-serif-medium"
+                            android:paddingStart="10dp"
+                            android:paddingTop="4dp"
+                            android:paddingEnd="10dp"
+                            android:paddingBottom="4dp"
+                            android:textColor="#E8C887"
+                            android:textSize="11sp" />
+                    </LinearLayout>
+
+                    <TextView
+                        android:id="@+id/ep_number"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_marginTop="10dp"
+                        android:fontFamily="sans-serif-thin"
+                        android:includeFontPadding="false"
+                        android:text="—"
+                        android:textColor="#E8C887"
+                        android:textSize="72sp" />
+
+                    <TextView
+                        android:id="@+id/ep_title"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_marginTop="6dp"
+                        android:ellipsize="end"
+                        android:fontFamily="sans-serif"
+                        android:maxLines="2"
+                        android:textColor="#F4EEDF"
+                        android:textSize="20sp" />
+
+                    <TextView
+                        android:id="@+id/status_line"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_marginTop="6dp"
+                        android:textColor="#E8957A"
+                        android:textSize="13sp"
+                        android:visibility="gone" />
+
+                    <ProgressBar
+                        android:id="@+id/progress"
+                        style="@android:style/Widget.ProgressBar.Horizontal"
+                        android:layout_width="match_parent"
+                        android:layout_height="5dp"
+                        android:layout_marginTop="22dp"
+                        android:max="1000"
+                        android:progressDrawable="@drawable/progress_gold" />
+
+                    <LinearLayout
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_marginTop="8dp"
+                        android:orientation="horizontal">
+
+                        <TextView
+                            android:id="@+id/time_pos"
+                            android:layout_width="0dp"
+                            android:layout_height="wrap_content"
+                            android:layout_weight="1"
+                            android:fontFeatureSettings="tnum"
+                            android:text="0:00"
+                            android:textColor="#8A93A6"
+                            android:textSize="12sp" />
+
+                        <TextView
+                            android:id="@+id/time_left"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:fontFeatureSettings="tnum"
+                            android:textColor="#8A93A6"
+                            android:textSize="12sp" />
+                    </LinearLayout>
+                </LinearLayout>
+
+                <!-- Transport controls -->
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="26dp"
+                    android:gravity="center"
+                    android:orientation="horizontal">
+
+                    <ImageButton
+                        android:id="@+id/btn_shuffle"
+                        android:layout_width="58dp"
+                        android:layout_height="58dp"
+                        android:background="@drawable/bg_circle"
+                        android:contentDescription="Shuffle a new queue"
+                        android:padding="17dp"
+                        android:scaleType="fitCenter"
+                        android:src="@drawable/ic_shuffle"
+                        android:tint="#C9CFDB" />
+
+                    <ImageButton
+                        android:id="@+id/btn_pause"
+                        android:layout_width="88dp"
+                        android:layout_height="88dp"
+                        android:layout_marginStart="30dp"
+                        android:layout_marginEnd="30dp"
+                        android:background="@drawable/bg_play"
+                        android:contentDescription="Play or pause"
+                        android:elevation="8dp"
+                        android:padding="26dp"
+                        android:scaleType="fitCenter"
+                        android:src="@drawable/ic_pause"
+                        android:tint="#1C1408" />
+
+                    <ImageButton
+                        android:id="@+id/btn_next"
+                        android:layout_width="58dp"
+                        android:layout_height="58dp"
+                        android:background="@drawable/bg_circle"
+                        android:contentDescription="Next episode"
+                        android:padding="17dp"
+                        android:scaleType="fitCenter"
+                        android:src="@drawable/ic_next"
+                        android:tint="#C9CFDB" />
+                </LinearLayout>
+
+                <!-- Queue stats -->
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="28dp"
+                    android:gravity="center"
+                    android:orientation="horizontal">
+
+                    <TextView
+                        android:id="@+id/chip_queue"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:background="@drawable/bg_chip"
+                        android:drawableStart="@drawable/ic_queue"
+                        android:drawablePadding="6dp"
+                        android:drawableTint="#8A93A6"
+                        android:gravity="center_vertical"
+                        android:paddingStart="12dp"
+                        android:paddingTop="7dp"
+                        android:paddingEnd="14dp"
+                        android:paddingBottom="7dp"
+                        android:textColor="#C9CFDB"
+                        android:textSize="13sp" />
+
+                    <TextView
+                        android:id="@+id/chip_saved"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_marginStart="10dp"
+                        android:background="@drawable/bg_chip"
+                        android:drawableStart="@drawable/ic_download"
+                        android:drawablePadding="6dp"
+                        android:drawableTint="#8A93A6"
+                        android:gravity="center_vertical"
+                        android:paddingStart="12dp"
+                        android:paddingTop="7dp"
+                        android:paddingEnd="14dp"
+                        android:paddingBottom="7dp"
+                        android:textColor="#C9CFDB"
+                        android:textSize="13sp" />
+                </LinearLayout>
+
+                <TextView
+                    android:id="@+id/chip_timer"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_gravity="center_horizontal"
+                    android:layout_marginTop="10dp"
+                    android:background="@drawable/bg_chip_gold"
+                    android:drawableStart="@drawable/ic_timer"
+                    android:drawablePadding="6dp"
+                    android:drawableTint="#E8C887"
+                    android:gravity="center_vertical"
+                    android:paddingStart="12dp"
+                    android:paddingTop="7dp"
+                    android:paddingEnd="14dp"
+                    android:paddingBottom="7dp"
+                    android:textColor="#E8C887"
+                    android:textSize="13sp"
+                    android:visibility="gone" />
+
+                <TextView
+                    android:id="@+id/download_info"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="10dp"
+                    android:gravity="center"
+                    android:textColor="#667085"
+                    android:textSize="12sp" />
+
+                <!-- Up next -->
+                <LinearLayout
+                    android:id="@+id/up_next_card"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="22dp"
+                    android:background="@drawable/bg_card"
+                    android:orientation="vertical"
+                    android:paddingStart="22dp"
+                    android:paddingTop="18dp"
+                    android:paddingEnd="22dp"
+                    android:paddingBottom="10dp">
+
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_marginBottom="4dp"
+                        android:fontFamily="sans-serif-medium"
+                        android:letterSpacing="0.2"
+                        android:text="UP NEXT"
+                        android:textColor="#8A93A6"
+                        android:textSize="11sp" />
+
+                    <LinearLayout
+                        android:id="@+id/up_next_list"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:orientation="vertical" />
+                </LinearLayout>
+
+                <TextView
+                    android:id="@+id/btn_stop"
+                    android:layout_width="match_parent"
+                    android:layout_height="60dp"
+                    android:layout_marginTop="26dp"
+                    android:background="@drawable/bg_pill_stop"
+                    android:clickable="true"
+                    android:focusable="true"
+                    android:fontFamily="sans-serif-medium"
+                    android:gravity="center"
+                    android:text="Stop  ·  Good morning"
+                    android:textColor="#F2B6A3"
+                    android:textSize="17sp" />
+            </LinearLayout>
+
         </LinearLayout>
+    </ScrollView>
+
+    <!-- ============ Side menu ============ -->
+    <View
+        android:id="@+id/drawer_scrim"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:alpha="0"
+        android:background="#B3000000"
+        android:clickable="true"
+        android:focusable="true"
+        android:visibility="gone" />
+
+    <LinearLayout
+        android:id="@+id/drawer"
+        android:layout_width="300dp"
+        android:layout_height="match_parent"
+        android:background="@drawable/bg_drawer"
+        android:clickable="true"
+        android:elevation="16dp"
+        android:focusable="true"
+        android:orientation="vertical"
+        android:paddingStart="16dp"
+        android:paddingTop="32dp"
+        android:paddingEnd="16dp"
+        android:paddingBottom="24dp"
+        android:visibility="gone">
+
+        <ImageView
+            android:layout_width="44dp"
+            android:layout_height="44dp"
+            android:layout_marginStart="12dp"
+            android:src="@drawable/ic_moon"
+            android:tint="#E8C887" />
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="12dp"
+            android:layout_marginTop="14dp"
+            android:fontFamily="sans-serif-light"
+            android:text="@string/app_name"
+            android:textColor="#F4EEDF"
+            android:textSize="26sp" />
+
+        <TextView
+            android:id="@+id/drawer_show"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="12dp"
+            android:layout_marginTop="2dp"
+            android:ellipsize="end"
+            android:maxLines="2"
+            android:textColor="#8A93A6"
+            android:textSize="13sp" />
+
+        <View
+            android:layout_width="match_parent"
+            android:layout_height="1dp"
+            android:layout_marginStart="12dp"
+            android:layout_marginTop="22dp"
+            android:layout_marginEnd="12dp"
+            android:layout_marginBottom="14dp"
+            android:background="#1FFFFFFF" />
+
+        <TextView
+            android:id="@+id/menu_now"
+            style="@style/MenuItem"
+            android:background="@drawable/bg_menu_item_active"
+            android:drawableStart="@drawable/ic_headphones"
+            android:drawableTint="#E8C887"
+            android:text="Now playing"
+            android:textColor="#E8C887" />
+
+        <TextView
+            android:id="@+id/menu_settings"
+            style="@style/MenuItem"
+            android:drawableStart="@drawable/ic_settings"
+            android:text="Settings" />
+
+        <TextView
+            android:id="@+id/menu_refresh"
+            style="@style/MenuItem"
+            android:drawableStart="@drawable/ic_shuffle"
+            android:text="Shuffle a new queue" />
+
+        <TextView
+            android:id="@+id/menu_help"
+            style="@style/MenuItem"
+            android:drawableStart="@drawable/ic_help"
+            android:text="How it works" />
+
+        <TextView
+            android:id="@+id/menu_about"
+            style="@style/MenuItem"
+            android:drawableStart="@drawable/ic_info"
+            android:text="About &amp; disclaimer" />
+
+        <View
+            android:layout_width="match_parent"
+            android:layout_height="0dp"
+            android:layout_weight="1" />
+
+        <TextView
+            android:id="@+id/menu_version"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="12dp"
+            android:textColor="#556075"
+            android:textSize="12sp" />
     </LinearLayout>
-</ScrollView>
+</FrameLayout>

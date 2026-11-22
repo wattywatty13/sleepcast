@@ -1,11 +1,29 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
     <style name="AppTheme" parent="@android:style/Theme.Material.NoActionBar">
-        <item name="android:statusBarColor">#0B0E14</item>
-        <item name="android:navigationBarColor">#0B0E14</item>
+        <item name="android:statusBarColor">#04060D</item>
+        <item name="android:navigationBarColor">#2A1B3A</item>
         <item name="android:windowBackground">@color/bg</item>
-        <item name="android:colorAccent">#C9A96E</item>
+        <item name="android:colorAccent">#E8C887</item>
+        <item name="android:textCursorDrawable">@null</item>
     </style>
-    <color name="bg">#0B0E14</color>
+
+    <style name="MenuItem">
+        <item name="android:layout_width">match_parent</item>
+        <item name="android:layout_height">52dp</item>
+        <item name="android:layout_marginTop">2dp</item>
+        <item name="android:background">@drawable/bg_menu_item</item>
+        <item name="android:clickable">true</item>
+        <item name="android:focusable">true</item>
+        <item name="android:drawablePadding">18dp</item>
+        <item name="android:drawableTint">#C9CFDB</item>
+        <item name="android:gravity">center_vertical</item>
+        <item name="android:paddingStart">16dp</item>
+        <item name="android:paddingEnd">16dp</item>
+        <item name="android:textColor">#F4EEDF</item>
+        <item name="android:textSize">16sp</item>
+    </style>
+
+    <color name="bg">#04060D</color>
     <color name="icon_bg">#141A26</color>
 </resources>

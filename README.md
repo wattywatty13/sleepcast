@@ -18,11 +18,26 @@ A simple Android "background noise" podcast player. Open it at bedtime and it pi
 ## Features
 - **Any podcast:** works with any public RSS/XML podcast feed (and basic Atom feeds).
 - **Episode range:** e.g. only episodes #1–#700, or #200 onward.
-- **Random queue each night:** 20 episodes by default, and you can change the number. When the queue runs out it adds another batch, so it never goes silent.
+- **Random queue each night:** 20 episodes by default, and you can change the number. Optionally adds another batch when the queue runs out, so it never goes silent.
 - **Wi-Fi caching:** downloads the queue in the background on Wi-Fi. Off Wi-Fi it plays only downloaded episodes, unless you allow mobile data.
-- **Sleep-friendly:** dark screen, pauses for alarms and calls and resumes after, pauses if headphones are unplugged, and has a big Stop button plus lock-screen controls.
+- **Sleep-friendly design:** a night-sky screen with twinkling stars, a big "Now playing" card with a progress bar, an "Up next" list, and a large Stop button.
+- **Bedtime extras:** an optional sleep timer and adjustable playback speed. It pauses for alarms and calls and resumes after, and pauses if headphones are unplugged.
+- **Side menu (☰):** Now playing, Settings, Shuffle a new queue, How it works, About & disclaimer.
 - **Doesn't restart itself:** opening the app while it's playing just shows the controls.
 - **No third-party libraries:** plain Android framework only (Android 8.0+).
+
+## The Settings page
+Open it from the ☰ menu. Everything except the Podcast section saves as you change it, and takes effect right away, even mid-playback.
+
+| Section | Settings |
+|---|---|
+| **Podcast** | RSS feed URL · episode range (from / to, 0 = no limit) · episode numbering (automatic / feed numbers / release order) · **Test feed** (shows the show name and how many episodes are in range) · **Save** |
+| **Playback** | Episodes per night · start playing when opened · keep going after the queue · sleep timer (15 min – 8 h) · playback speed (0.75× – 1.5×) · pause when headphones unplug |
+| **Downloads & data** | Download queue ahead on Wi-Fi · stream on mobile data · keep up to N episodes · storage used, with a **Clear** button |
+| **Episode list** | How often to check the feed for new episodes · refresh now |
+| **About** | Disclaimer · project page · version |
+
+**Reset all settings** at the bottom goes back to the built-in defaults in `config.xml`. Downloaded episodes are kept.
 
 ## Setting it up for your podcast
 
@@ -42,13 +57,14 @@ Edit **`app/src/main/res/values/config.xml`**:
 | `auto_start_on_open` | Start playing as soon as the app opens | `true` |
 | `max_cached_episodes` | Max episodes kept on the phone | `30` |
 | `feed_refresh_days` | Re-check the feed every N days (`0` = fetch once) | `7` |
+| `project_url` | Link shown on the About screen | your repo URL |
 
 The shipped defaults are an example (Rooster Teeth Podcast, episodes 1–700). Change them to your show.
 
 To run more than one copy side by side (one per podcast), also change `applicationId` in `app/build.gradle`.
 
 ### 2. In the app
-Tap **Settings: podcast feed & episode range** to change the feed URL, range, queue size and numbering without rebuilding. **Reset defaults** goes back to whatever is in `config.xml`.
+Open **☰ → Settings** to change any of it without rebuilding (see above).
 
 ### How episodes get their numbers
 - **auto (default):** uses the feed's own numbers (`<itunes:episode>`, or "#123" / "Episode 123" in the title) when at least 80% of episodes have one. Otherwise it uses release order.
@@ -85,8 +101,11 @@ Then update `signingConfigs` in `app/build.gradle`.
 ```
 app/src/main/res/values/config.xml   ← your settings
 app/src/main/java/com/sleepcast/player/
-  MainActivity.java     screen + settings form
-  PlayerService.java    playback, queue, Wi-Fi downloads, notification
+  MainActivity.java     now-playing screen + side menu
+  SettingsActivity.java the Settings page
+  PlayerService.java    playback, queue, Wi-Fi downloads, sleep timer, notification
+  StarfieldView.java    the night-sky background
+  Downloads.java        saved-episode storage
   FeedRepository.java   RSS parsing, numbering, range filter, feed cache
   Settings.java         config.xml defaults + in-app overrides
   Episode.java

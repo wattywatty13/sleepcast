@@ -35,6 +35,9 @@
     <!-- Maximum number of downloaded episodes kept on the phone. -->
     <integer name="max_cached_episodes">30</integer>
 
+    <!-- Shown on the About screen. Point it at your own copy of the project. -->
+    <string name="project_url">https://github.com/wattywatty13/sleepcast</string>
+
     <!-- How often (in days) to re-check the feed for new episodes. 0 = never (fetch once). -->
     <integer name="feed_refresh_days">7</integer>
 </resources>
