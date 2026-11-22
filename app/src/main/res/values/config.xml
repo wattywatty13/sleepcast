@@ -1,0 +1,40 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+  ================================================================
+   SLEEPCAST CONFIG: edit these values to point the app at any
+   podcast, then rebuild. They can also be changed later inside
+   the app under "Settings", which overrides what's here.
+  ================================================================
+-->
+<resources>
+
+    <!-- Name shown under the app icon. -->
+    <string name="app_name">SleepCast</string>
+
+    <!-- The podcast's public RSS (XML) feed URL. -->
+    <string name="default_feed_url">https://feeds.megaphone.fm/roosterteethpodcast</string>
+
+    <!-- Only episodes in this range are picked (inclusive).
+         Set default_max_episode to 0 for "no upper limit". -->
+    <integer name="default_min_episode">1</integer>
+    <integer name="default_max_episode">700</integer>
+
+    <!-- How many random episodes to queue each night. -->
+    <integer name="default_queue_size">20</integer>
+
+    <!-- How episode numbers are worked out:
+         auto  = use the feed's own numbers (<itunes:episode> or "#123" in the title)
+                 when most episodes have one, otherwise fall back to "order"
+         tag   = only use the feed's own numbers; skip episodes without one
+         order = count by release date: the oldest episode is 1, the next is 2, and so on -->
+    <string name="default_numbering">auto</string>
+
+    <!-- Start playing automatically when the app is opened. -->
+    <bool name="auto_start_on_open">true</bool>
+
+    <!-- Maximum number of downloaded episodes kept on the phone. -->
+    <integer name="max_cached_episodes">30</integer>
+
+    <!-- How often (in days) to re-check the feed for new episodes. 0 = never (fetch once). -->
+    <integer name="feed_refresh_days">7</integer>
+</resources>

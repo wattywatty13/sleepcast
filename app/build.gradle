@@ -1,0 +1,48 @@
+plugins {
+    id 'com.android.application'
+}
+
+android {
+    namespace 'com.sleepcast.player'
+    compileSdk 35
+
+    defaultConfig {
+        applicationId 'com.sleepcast.player'
+        minSdk 26
+        targetSdk 35
+        versionCode 1
+        versionName '1.0'
+    }
+
+    signingConfigs {
+        // A fixed key checked into the project so every build can install over the last one.
+        shared {
+            storeFile file('sleepcast.keystore')
+            storePassword 'sleepcast'
+            keyAlias 'sleepcast'
+            keyPassword 'sleepcast'
+        }
+    }
+
+    buildTypes {
+        debug {
+            signingConfig signingConfigs.shared
+        }
+        release {
+            minifyEnabled false
+            signingConfig signingConfigs.shared
+        }
+    }
+
+    lint {
+        abortOnError false
+        checkReleaseBuilds false
+    }
+
+    compileOptions {
+        sourceCompatibility JavaVersion.VERSION_17
+        targetCompatibility JavaVersion.VERSION_17
+    }
+}
+
+// No external libraries: plain Android framework only.
