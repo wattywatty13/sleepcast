@@ -4,6 +4,9 @@ on:
   push:
   workflow_dispatch:
 
+permissions:
+  contents: write
+
 jobs:
   build:
     runs-on: ubuntu-latest
@@ -20,3 +23,13 @@ jobs:
         with:
           name: SleepCast-apk
           path: app/build/outputs/apk/release/*.apk
+      - name: Publish release
+        if: github.ref == 'refs/heads/main'
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          cp app/build/outputs/apk/release/app-release.apk SleepCast.apk
+          gh release create "build-${{ github.run_number }}" SleepCast.apk \
+            --title "SleepCast build ${{ github.run_number }}" \
+            --notes "Download SleepCast.apk below and open it on your phone to install." \
+            --target "${{ github.sha }}" --latest
